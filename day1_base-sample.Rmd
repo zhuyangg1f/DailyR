@@ -1,0 +1,55 @@
+---
+title: "Base::sample()"
+author: "Yang Zhu"
+date: "9/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+`sample` takes a sample of the specified size from the elements of x using either with or without replacement.
+
+sample(x, size, replace = FALSE, prob = NULL)
+
+
+### Sampling without replacement (Shuffle cards)
+
+```{r}
+set.seed(100)
+# draw cards with equal probability
+cards <- 1:13
+sample(cards, size = 13)
+# Randomly picking students in order
+students <- c("David","Stephen","Cathy","Mike","May")
+sample(students, size = length(students))
+```
+
+### Sampling with replacement (roll dice/coin)
+
+```{r}
+# roll dice
+dice = c(1,2,3,4,5,6)
+sample(dice, size = 2, replace = T)
+# flip unfair coins
+coin = c("Head","Tail")
+sample(coin, size = 20, replace = T, prob = c(0.1, 0.9))
+```
+
+### Simulation tasks
+
+```{r}
+total_head <- 0
+# repeat the experiment 100000 times
+for(i in 1:100000){
+  
+  flip <- sample(coin, size = 1, replace = T)
+  # Increasing the count by 1 only if it's a head
+  if(flip == "Head"){
+    total_head = total_head + 1
+  }
+  
+} 
+print(total_head)
+```
