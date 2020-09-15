@@ -1,0 +1,47 @@
+---
+title: "Base:switch"
+author: "Yang Zhu"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+`switch` takes one input called `EXPR` which can be either numeric or character.
+
+switch(EXPR, ...)
+
+### Win prize by tossing a coin
+```{r echo=FALSE, include=TRUE, message=FALSE}
+library(dplyr)
+```
+
+```{r}
+coin <- c('Head', "Tail")
+toss <- sample(coin, size = 1); toss
+result <- switch(
+  toss,
+  "Head" = 'Win',
+  "Tail" = "Loss"
+)
+print(result)
+```
+
+### Filter data based on different input
+```{r}
+options <- c("Long Sepal", "Medium Sepal", "Short Sepal")
+choice <- sample(options, size = 1); choice
+iris_subset <- switch(
+    choice,
+    "Long Sepal" = datasets::iris %>%
+      filter(Sepal.Length >= 7),
+    "Medium Sepal" = datasets::iris %>%
+      filter(Sepal.Length >= 5,
+             Sepal.Length < 7),
+    "Short Sepal" = datasets::iris %>%
+      filter(Sepal.Length < 5)
+    )
+summary(iris_subset$Sepal.Length)
+```
