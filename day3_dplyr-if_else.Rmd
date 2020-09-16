@@ -1,0 +1,77 @@
+---
+title: "dplyr::if_else()"
+author: "Yang Zhu"
+date: "9/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, include=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(lubridate)
+```
+
+We will discuss the difference between `base::ifelse()` and `dplyr::if_else`. I
+would highly recommend to use dplyr::if\_else since it is more user friendly
+when dealing with date objetcs and missing data.
+
+ifelse(test, yes, no)
+if_else(condition, true, false, missing = NULL)
+
+## Dealing with missing data
+```{r}
+numeric_lst <- c(5, 4, 3, NA, NA, 2, 1, -1, 0)
+ifelse(numeric_lst >= 3, "Big", "Small")
+if_else(numeric_lst >= 3, "Big", "Small")
+if_else(numeric_lst >= 3, "Big", "Small", missing = "Not Applicable")
+```
+
+## Coercion Problem
+
+You have to keep that in mind. `ifelse()` would coerce the return values for
+both TRUE and FALSE to same object type, but `if_else()` would not. It gives an
+error message instead. Automatical coercion is not always good, you will see
+examples later on.
+
+```{r error=TRUE}
+ifelse(numeric_lst >= 3, "Big", 0)
+if_else(numeric_lst >= 3, "Big", 0)
+```
+
+## Replace with NA
+
+Sometimes we do want to replace `NA` if condition is FALSE. However, you will
+see error message when you are using `dplyr::if_else()`. Because there are
+different kind of `NA` in R. In the case below, you should use `NA_character_`
+instead.
+
+```{r error=TRUE}
+ifelse(numeric_lst >= 3, "Big", NA)
+if_else(numeric_lst >= 3, "Big", NA)
+if_else(numeric_lst >= 3, "Big", NA_character_)
+```
+
+## Dealing with date object
+
+In the first two examples, you can see `base:ifelse()` function coerce all dates
+into numeric object, but `dplyr::if_else()` does not. You should be very careful
+with replace `NA` on date object, there is no `NA_date` in R. You could use
+`as_date("")` as `NA` here.
+
+```{r error=TRUE}
+date_lst <- lubridate::as_date(c("2020-08-01", "2020-09-01", NA, "1999-01-01"))
+# base:ifelse()
+ifelse(date_lst > "2020-01-01", 0, date_lst)
+wrong_output <- ifelse(date_lst > "2020-01-01", date_lst - ddays(1), date_lst); wrong_output
+class(wrong_output)
+# dplyr::if_else()
+correct_output <- if_else(date_lst > "2020-01-01", date_lst - ddays(1), date_lst); correct_output
+class(correct_output)
+# replace with NA
+if_else(date_lst > "2020-01-01", NA, date_lst)
+if_else(date_lst > "2020-01-01", NA_complex_, date_lst)
+if_else(date_lst > "2020-01-01", as_date(""), date_lst)
+```
