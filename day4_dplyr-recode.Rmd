@@ -1,0 +1,51 @@
+---
+title: "dplyr::recode()"
+author: "Yang Zhu"
+date: "9/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, include=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+`dplyr::recode()` can be used along with `dplyr::mutate()` for replacing certain values in a column. 
+Sometimes it could be a good alternative for `if_else()`
+
+recode(.x, ..., .default = NULL, .missing = NULL)
+
+argument `.x` is a vector to modify
+
+argument `.default` states the replacement for all values not otherwise matched. 
+Please note if replacement is `NA`, it should be something like `NA_character` or `NA_integer`
+
+argument `.missing` states the replacement for missing values
+
+## Replace character object
+```{r}
+# .default not specified
+iris %>% 
+  mutate(Species = recode(Species, setosa = "Type 1")) %>% 
+  sample_n(size = 10)
+# .default has been specified
+iris %>% 
+  mutate(Species = recode(Species, setosa = "Type 1", .default = NA_character_)) %>% 
+  sample_n(size = 10)
+```
+
+## Replace numeric object
+```{r}
+# .default not specified
+iris %>% 
+  mutate(Sepal.Length = recode(Sepal.Length, `5.5` = 100)) %>% 
+  filter(Sepal.Length == 100)
+# .default has been specified
+iris %>% 
+  mutate(Sepal.Length = recode(Sepal.Length, `5.5` = 100, .default = NA_real_)) %>% 
+  filter(Sepal.Length == 100 | Sepal.Width < 2.5) %>% 
+  sample_n(size = 10)
+```
