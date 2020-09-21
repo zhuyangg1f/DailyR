@@ -1,0 +1,69 @@
+---
+title: "dplyr::across()"
+author: "Yang Zhu"
+date: "9/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, include=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+`across()` function applies the same transformation to multiple columns, it can be used along with `summarise()` and `mutate()` functions. Similarly, `c_across()` works with `rowwise()` to make row-wise agrregations.
+
+## Usage
+
+across(.cols = everything(), .fns = NULL, ..., .names = NULL) \
+c_across(cols = everything())
+
+Note: `.fns` argument can take a function like `mean()`, a purrr-styple lambda \
+e.g. `~ mean(.x, na.rm = TRUE)` or a list of functions/lambdas \
+e.g. `list(mean = mean, n_miss = ~ sum(is.na(.x))`
+
+## Using function directly
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(across(starts_with("Sepal"), mean)) %>% 
+  ungroup()
+
+iris %>% 
+  mutate(across(starts_with("Sepal"), as.character)) %>%
+  glimpse()
+```
+
+## Using purrr style
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(across(starts_with("Sepal"), ~max(.x, na.rm = TRUE))) %>% 
+  ungroup()
+```
+
+## Using list of functions
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(across(ends_with("Length"), list(mean = mean, sd = sd), .names = "{col}.{fn}")) %>% 
+  ungroup()
+```
+
+## rowwsie summation
+
+Doing operation on each row
+
+```{r}
+iris %>%
+  rowwise() %>%
+  mutate(
+    sum = sum(c_across(Sepal.Length:Petal.Width)),
+    sd = sd(c_across(Sepal.Length:Petal.Width))
+ )
+```
