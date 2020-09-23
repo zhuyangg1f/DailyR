@@ -45,3 +45,29 @@ iris_subset <- switch(
     )
 summary(iris_subset$Sepal.Length)
 ```
+
+\newpage
+
+## Use case_when on writing function
+
+### switch() in a function
+```{r}
+get_quantile_data_switch <- function(data, column, quantile = c('1st Qu','Median','3rd Qu')) {
+  
+  column <- enquo(column)
+  quantile <- match.arg(quantile)
+  
+  output <- switch(
+    quantile,
+    '1st Qu' = data %>% filter(!!column <= quantile(!!column)[2]),
+    'Median' = data %>% filter(!!column <= quantile(!!column)[3]),
+    '3rd Qu' = data %>% filter(!!column <= quantile(!!column)[4])
+  )
+  
+  return(output)
+
+}
+get_quantile_data_switch(iris, Petal.Length, '1st Qu') %>% select(Petal.Length) %>% summary()
+get_quantile_data_switch(iris, Petal.Length, 'Median') %>% select(Petal.Length) %>% summary()
+get_quantile_data_switch(iris, Petal.Length, '3rd Qu') %>% select(Petal.Length) %>% summary()
+```
