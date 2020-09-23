@@ -1,0 +1,42 @@
+---
+title: "dplyr::case_when()"
+author: "Yang Zhu"
+date: "9/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, include=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+`case_when()` function allows you to vectorise multiple if_else() statements. If no cases match, NA is returned. \
+The difference between `case_when()` and `switch()` is that, usually `case_when()` is used for data manipulation purpose along with `mutate()`, the conditions can be complicated. However, `switch()` is more widely used in function writing, one kind of argument input leads to a completely different data processing method than others.
+
+## Use case_when on data manipulation
+
+```{r}
+# get data summary of iris
+summary(iris)
+# classify iris size by Sepal, Petal length and width
+iris_new <- iris %>% 
+  mutate(size = case_when(
+    Sepal.Length <= 5.1 & Sepal.Width <= 2.8 | Petal.Length <= 1.6 & Petal.Width <= 0.3 ~ "small",
+    Sepal.Length >= 6.4 & Sepal.Width >= 3.3 | Petal.Length >= 5.1 & Petal.Width >= 1.8 ~ "large",
+    TRUE ~ "medium"
+  )) 
+
+iris_new %>% 
+  count(size)
+# seeing how classification works
+table(iris_new$Species, iris_new$size)
+```
+
+\newline
+We can see most of setosa has small size and most of virginica has large size.
+
+
+
